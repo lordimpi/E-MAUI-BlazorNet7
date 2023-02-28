@@ -6,12 +6,12 @@ using Sales.Shared.Entities;
 namespace Sales.API.Controllers
 {
     [ApiController]
-    [Route("api/countries")]
-    public class CountriesController : ControllerBase
+    [Route("api/categories")]
+    public class CategoriesController : ControllerBase
     {
         private readonly DataContext _context;
 
-        public CountriesController(DataContext context)
+        public CategoriesController(DataContext context)
         {
             _context = context;
         }
@@ -19,49 +19,35 @@ namespace Sales.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAsync()
         {
-            List<Country> countries = await _context.Countries
-                .Include(c => c.States)
-                .ToListAsync();
-            return Ok(countries);
-        }
-
-        [HttpGet("full")]
-        public async Task<IActionResult> GetFullAsync()
-        {
-            List<Country> countries = await _context.Countries
-                .Include(c => c.States!)
-                .ThenInclude(s => s.Cities)
-                .ToListAsync();
-            return Ok(countries);
+            List<Category> categories = await _context.Categories.ToListAsync();
+            return Ok(categories);
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetAsync(int id)
         {
-            var country = await _context.Countries
-                .Include(c => c.States)
-                .FirstOrDefaultAsync(c => c.Id == id);
-            if (country is null)
+            var Category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            if (Category is null)
             {
                 return NotFound();
             }
-            return Ok(country);
+            return Ok(Category);
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync(Country country)
+        public async Task<IActionResult> PostAsync(Category category)
         {
             try
             {
-                _context.Add(country);
+                _context.Add(category);
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(category);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un país con el mismo nombre.");
+                    return BadRequest("Ya existe una categoría con el mismo nombre.");
                 }
 
                 return BadRequest(dbUpdateException.InnerException.Message);
@@ -74,19 +60,19 @@ namespace Sales.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutAsync(Country country)
+        public async Task<IActionResult> PutAsync(Category category)
         {
             try
             {
-                _context.Update(country);
+                _context.Update(category);
                 await _context.SaveChangesAsync();
-                return Ok(country);
+                return Ok(category);
             }
             catch (DbUpdateException dbUpdateException)
             {
                 if (dbUpdateException.InnerException!.Message.Contains("duplicate"))
                 {
-                    return BadRequest("Ya existe un país con el mismo nombre.");
+                    return BadRequest("Ya existe una categoría con el mismo nombre.");
                 }
 
                 return BadRequest(dbUpdateException.InnerException.Message);
@@ -101,12 +87,12 @@ namespace Sales.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteAsync(int id)
         {
-            var country = await _context.Countries.FirstOrDefaultAsync(c => c.Id == id);
-            if (country is null)
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            if (category is null)
             {
                 return NotFound();
             }
-            _context.Remove(country);
+            _context.Remove(category);
             await _context.SaveChangesAsync();
             return NoContent();
         }
