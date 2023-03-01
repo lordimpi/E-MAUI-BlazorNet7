@@ -1,34 +1,34 @@
-﻿@page "/countries/edit/{Id:int}"
+﻿@page "/categories/edit/{Id:int}"
 @inject IRepository repository
 @inject NavigationManager navigationManager
 @inject SweetAlertService sweetAlertService
 
-<h3>Editar País</h3>
+<h3>Editar Categoría</h3>
 
-@if (country is null)
+@if (category is null)
 {
     <p>Cargando...</p>
 }
 else
 {
-    <CountryForm @ref="countryForm" Country="country" OnValidSubmit="EditAsync" ReturnAction="Return" />
+    <CategoryForm @ref="categoryForm" Category="category" OnValidSubmit="EditAsync" ReturnAction="Return" />
 }
 
 @code {
-    private Country? country;
-    private CountryForm? countryForm;
+    private Category? category;
+    private CategoryForm? categoryForm;
 
     [Parameter]
     public int Id { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        var responseHttp = await repository.Get<Country>($"/api/countries/{Id}");
+        var responseHttp = await repository.Get<Category>($"/api/categories/{Id}");
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == HttpStatusCode.NotFound)
             {
-                navigationManager.NavigateTo("/countries");
+                navigationManager.NavigateTo("/categories");
                 return;
             }
 
@@ -38,12 +38,12 @@ else
             return;
         }
 
-        country = responseHttp.Response;
+        category = responseHttp.Response;
     }
 
     private async Task EditAsync()
     {
-        var responseHttp = await repository.Put("/api/countries", country);
+        var responseHttp = await repository.Put("/api/categories", category);
         if (responseHttp.Error)
         {
             var message = await responseHttp.GetErrorMessageAsync();
@@ -56,7 +56,7 @@ else
 
     private void Return()
     {
-        countryForm!.FormPostedSuccessfully = true;
-        navigationManager.NavigateTo("/countries");
+        categoryForm!.FormPostedSuccessfully = true;
+        navigationManager.NavigateTo("/categories");
     }
 }
